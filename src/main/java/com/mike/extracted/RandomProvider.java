@@ -3,7 +3,9 @@ package com.mike.extracted;
 import java.util.function.LongFunction;
 
 public enum RandomProvider {
-    XOROSHIRO(Xoroshiro128PlusPlusRandom::new);
+    XOROSHIRO(Xoroshiro128PlusPlusRandom::new),
+
+    CHECKED(CheckedRandom::new);
 
     private final LongFunction<AbstractRandom> provider;
 

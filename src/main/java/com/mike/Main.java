@@ -10,6 +10,7 @@ public class Main {
 
     public static void main(String[] args) {
         long seed = Long.parseLong(args[0]);
+        final boolean aligned = args[3].equals("--aligned") || args[3].equals("-a");
 
         String[] coordinateString = args[1].split(":");
         int x = Integer.parseInt(coordinateString[0]);
@@ -17,11 +18,14 @@ public class Main {
 
         BedrockReader.BedrockType bedrockType = switch (args[2]) {
             case "floor" -> BedrockReader.BedrockType.BEDROCK_FLOOR;
-            case "roof" -> BedrockReader.BedrockType.BEDROCK_ROOF;
-            default -> BedrockReader.BedrockType.BEDROCK_FLOOR;
+            case "nether_floor" -> BedrockReader.BedrockType.NETHER_FLOOR;
+            case "roof", "nether_roof" -> BedrockReader.BedrockType.BEDROCK_ROOF;
+            default -> throw new IllegalArgumentException("unknown type: " + args[2]);
         };
 
-        Arrays.stream(args).skip(3).forEach((arg) -> blocks.add(new BedrockBlock(arg)));
+        final boolean checkInvert = true;
+
+        Arrays.stream(args).skip(aligned ? 4 : 3).forEach((arg) -> blocks.add(new BedrockBlock(arg)));
         blocks.sort((b1, b2) -> {
             switch (bedrockType) {
                 case BEDROCK_FLOOR -> {
@@ -42,10 +46,12 @@ public class Main {
         int stepsToTake = 1;
         int stepsTaken = 0;
         int sidesUntilIncremental = 0;
+        int extraDivision = 0;
 
         while (true) {
-            if (checkFormation(x, z)) {
+            if (checkFormation(x, z) || (checkInvert && checkFormationInvert(x, z))) {
                 System.out.println("Found Bedrock Formation at X:" + x + " Z:" + z);
+                System.out.println("/tp " + x + " ~ " + z);
                 break;
             }
 
@@ -65,14 +71,27 @@ public class Main {
             if (sidesUntilIncremental > 2) {
                 sidesUntilIncremental = 0;
                 stepsToTake++;
+                if (extraDivision++ > 1000) {
+                    extraDivision = 0;
+                    System.out.println(x + ";" + z);
+                }
             }
 
             // Make Step
-            switch (direction) {
-                case LEFT -> x--;
-                case RIGHT -> x++;
-                case UP -> z++;
-                case DOWN -> z--;
+            if (aligned) {
+                switch (direction) {
+                    case LEFT -> x -= 16;
+                    case RIGHT -> x += 16;
+                    case UP -> z += 16;
+                    case DOWN -> z -= 16;
+                }
+            } else {
+                switch (direction) {
+                    case LEFT -> x--;
+                    case RIGHT -> x++;
+                    case UP -> z++;
+                    case DOWN -> z--;
+                }
             }
             stepsTaken++;
         }
@@ -80,7 +99,13 @@ public class Main {
 
     static boolean checkFormation(int x, int z) {
         for (BedrockBlock block : blocks) {
-            if (!bedrockReader.isBedrock(x + block.x, block.y, z + block.z)) return false;
+            if (bedrockReader.isBedrock(x + block.x, block.y, z + block.z) != block.shouldBeBedrock) return false;
+        }
+        return true;
+    }
+    static boolean checkFormationInvert(int x, int z) {
+        for (BedrockBlock block : blocks) {
+            if (bedrockReader.isBedrock(x - 1 - block.x, block.y, z - 1 - block.z) != block.shouldBeBedrock) return false;
         }
         return true;
     }

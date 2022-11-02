@@ -6,8 +6,10 @@ public interface AbstractRandom {
     public RandomDeriver createRandomDeriver();
 
     public void setSeed(long var1);
+    default int nextInt() {
+        return this.nextInt(32);
+    }
 
-    public int nextInt();
 
     public int nextInt(int var1);
 
@@ -15,13 +17,28 @@ public interface AbstractRandom {
         return this.nextInt(max - min + 1) + min;
     }
 
-    public long nextLong();
+    default long nextLong() {
+        int i = this.nextInt(32);
+        int j = this.nextInt(32);
+        long l = (long)i << 32;
+        return l + (long)j;
+    }
 
-    public boolean nextBoolean();
+    default boolean nextBoolean() {
+        return this.nextInt(1) != 0;
+    }
 
-    public float nextFloat();
 
-    public double nextDouble();
+    default float nextFloat() {
+        return (float)this.nextInt(24) * 5.9604645E-8F;
+    }
+
+    default double nextDouble() {
+        int i = this.nextInt(26);
+        int j = this.nextInt(27);
+        long l = ((long)i << 27) + (long)j;
+        return (double)l * 1.1102230246251565E-16;
+    }
 
     public double nextGaussian();
 
