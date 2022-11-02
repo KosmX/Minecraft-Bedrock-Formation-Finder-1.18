@@ -6,12 +6,11 @@
 
 plugins {
     java
-    `maven-publish`
     kotlin("jvm") version "1.7.20"
+    `maven-publish`
 }
 
 repositories {
-    mavenLocal()
     maven {
         url = uri("https://repo.maven.apache.org/maven2/")
     }

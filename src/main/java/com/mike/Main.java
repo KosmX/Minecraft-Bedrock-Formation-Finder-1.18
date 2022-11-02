@@ -2,7 +2,6 @@ package com.mike;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Objects;
 
 public class Main {
     static ArrayList<BedrockBlock> blocks = new ArrayList<>();
@@ -13,8 +12,8 @@ public class Main {
         final boolean aligned = args[3].equals("--aligned") || args[3].equals("-a");
 
         String[] coordinateString = args[1].split(":");
-        int x = Integer.parseInt(coordinateString[0]);
-        int z = Integer.parseInt(coordinateString[1]);
+        int xDef = Integer.parseInt(coordinateString[0]);
+        int zDef = Integer.parseInt(coordinateString[1]);
 
         BedrockReader.BedrockType bedrockType = switch (args[2]) {
             case "floor" -> BedrockReader.BedrockType.BEDROCK_FLOOR;
@@ -42,58 +41,19 @@ public class Main {
 
         bedrockReader = new BedrockReader(seed, bedrockType);
 
-        Direction direction = Direction.RIGHT;
-        int stepsToTake = 1;
-        int stepsTaken = 0;
-        int sidesUntilIncremental = 0;
-        int extraDivision = 0;
+        //ThreadedKt.run(UtilKt.snail(aligned, xDef, zDef), bedrockReader);
 
-        while (true) {
+
+        var pattern = UtilKt.snail(aligned, xDef, zDef).iterator();
+        while (pattern.hasNext()) {
+            var xz = pattern.next();
+            var x = xz.getFirst();
+            var z = xz.getSecond();
             if (checkFormation(x, z) || (checkInvert && checkFormationInvert(x, z))) {
                 System.out.println("Found Bedrock Formation at X:" + x + " Z:" + z);
                 System.out.println("/tp " + x + " ~ " + z);
                 break;
             }
-
-            // Check for direction change
-            if (stepsTaken >= stepsToTake) {
-                stepsTaken = 0;
-                sidesUntilIncremental++;
-                switch (direction) {
-                    case LEFT -> direction = Direction.DOWN;
-                    case RIGHT -> direction = Direction.UP;
-                    case UP -> direction = Direction.LEFT;
-                    case DOWN -> direction = Direction.RIGHT;
-                }
-            }
-
-            // Increase steps to take
-            if (sidesUntilIncremental > 2) {
-                sidesUntilIncremental = 0;
-                stepsToTake++;
-                if (extraDivision++ > 1000) {
-                    extraDivision = 0;
-                    System.out.println(x + ";" + z);
-                }
-            }
-
-            // Make Step
-            if (aligned) {
-                switch (direction) {
-                    case LEFT -> x -= 16;
-                    case RIGHT -> x += 16;
-                    case UP -> z += 16;
-                    case DOWN -> z -= 16;
-                }
-            } else {
-                switch (direction) {
-                    case LEFT -> x--;
-                    case RIGHT -> x++;
-                    case UP -> z++;
-                    case DOWN -> z--;
-                }
-            }
-            stepsTaken++;
         }
     }
 
