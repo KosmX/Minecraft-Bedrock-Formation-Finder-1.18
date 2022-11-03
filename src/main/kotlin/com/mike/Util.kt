@@ -7,10 +7,15 @@ private enum class Direction {
 
 const val checkInvert = true
 
-/*
-fun modifiedSnail(aligned: Boolean = false) = sequence {
 
-}*/
+fun snailRanges(aligned: Boolean = false) = sequence {
+    val step = if (aligned) 16 else 1
+    val seq = snail(false).iterator()
+    while (true) {
+
+    }
+
+}
 
 fun snail(aligned: Boolean = false, xDefault: Int = 0, zDefault: Int = 0) = sequence {
     var x = xDefault; var z = zDefault
