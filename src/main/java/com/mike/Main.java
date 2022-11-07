@@ -2,7 +2,6 @@ package com.mike;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Objects;
 
 public class Main {
     static ArrayList<BedrockBlock> blocks = new ArrayList<>();
@@ -52,7 +51,7 @@ public class Main {
             if (checkFormation(x, z) || (checkInvert && checkFormationInvert(x, z))) {
                 System.out.println("Found Bedrock Formation at X:" + x + " Z:" + z);
                 System.out.println("/tp " + x + " ~ " + z);
-                break;
+                //break;
             }
 
             // Check for direction change
@@ -71,7 +70,7 @@ public class Main {
             if (sidesUntilIncremental > 2) {
                 sidesUntilIncremental = 0;
                 stepsToTake++;
-                if (extraDivision++ > 1000) {
+                if (extraDivision++ > 8192) {
                     extraDivision = 0;
                     System.out.println(x + ";" + z);
                 }

@@ -28,12 +28,12 @@ public final class BedrockReader {
             if (y == bedrockType.min) return true;
             if (y > bedrockType.max) return false;
 
-            probabilityValue = MathHelper.lerpFromProgress(y, bedrockType.min, bedrockType.max, 1.0, 0.0);
+            probabilityValue = bedrockType.probabilityValue[y - bedrockType.min]; //Skip a lot of hard math
         } else if (bedrockType == BedrockType.BEDROCK_ROOF) {
             if (y == bedrockType.min) return true;
             if (y < bedrockType.max) return false;
 
-            probabilityValue = MathHelper.lerpFromProgress(y, bedrockType.max, bedrockType.min, 1.0, 0.0);
+            probabilityValue = bedrockType.probabilityValue[y - bedrockType.max];
         }
 
         AbstractRandom abstractRandom = randomDeriver.createRandom(x, y, z);
@@ -50,10 +50,16 @@ public final class BedrockReader {
         public final int min;
         public final int max;
 
+        public final double[] probabilityValue;
+
         BedrockType(Identifier id, int min, int max) {
             this.id = id;
             this.min = min;
             this.max = max;
+            probabilityValue = new double[Math.abs(max - min + 1)];
+            for (int i = min; i <= max; i++) {
+                probabilityValue[Math.abs(i - min)] = MathHelper.lerpFromProgress(i, min, max, 1.0, 0.0);
+            }
         }
     }
 }
