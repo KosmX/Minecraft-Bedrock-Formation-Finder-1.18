@@ -1,8 +1,12 @@
 package com.mike;
 
+import dev.kosmx.bedrockfinder.UtilKt;
+import dev.kosmx.bedrockfinder.mc.BedrockBlock;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
+@SuppressWarnings("ConstantConditions")
 public class Main {
     static ArrayList<BedrockBlock> blocks = new ArrayList<>();
     static BedrockReader bedrockReader;
@@ -18,20 +22,20 @@ public class Main {
         BedrockReader.BedrockType bedrockType = switch (args[2]) {
             case "floor" -> BedrockReader.BedrockType.BEDROCK_FLOOR;
             case "nether_floor" -> BedrockReader.BedrockType.NETHER_FLOOR;
-            case "roof", "nether_roof" -> BedrockReader.BedrockType.BEDROCK_ROOF;
+            case "roof", "nether_roof" -> BedrockReader.BedrockType.NETHER_ROOF;
             default -> throw new IllegalArgumentException("unknown type: " + args[2]);
         };
 
         final boolean checkInvert = true;
 
-        Arrays.stream(args).skip(aligned ? 4 : 3).forEach((arg) -> blocks.add(new BedrockBlock(arg)));
+        Arrays.stream(args).skip(aligned ? 4 : 3).forEach((arg) -> blocks.add(BedrockBlock.Companion.invoke(arg)));
         blocks.sort((b1, b2) -> {
             switch (bedrockType) {
                 case BEDROCK_FLOOR -> {
-                    return b1.y < b2.y ? 1 : -1;
+                    return b1.getY() < b2.getY() ? 1 : -1;
                 }
-                case BEDROCK_ROOF -> {
-                    return b1.y < b2.y ? -1 : 1;
+                case NETHER_ROOF -> {
+                    return b1.getY() < b2.getY() ? -1 : 1;
                 }
             }
             return 0;
@@ -59,21 +63,14 @@ public class Main {
 
     static boolean checkFormation(int x, int z) {
         for (BedrockBlock block : blocks) {
-            if (bedrockReader.isBedrock(x + block.x, block.y, z + block.z) != block.shouldBeBedrock) return false;
+            if (bedrockReader.isBedrock(x + block.getX(), block.getY(), z + block.getZ()) != block.getShouldBeBedrock()) return false;
         }
         return true;
     }
     static boolean checkFormationInvert(int x, int z) {
         for (BedrockBlock block : blocks) {
-            if (bedrockReader.isBedrock(x - 1 - block.x, block.y, z - 1 - block.z) != block.shouldBeBedrock) return false;
+            if (bedrockReader.isBedrock(x - 1 - block.getX(), block.getY(), z - 1 - block.getZ()) != block.getShouldBeBedrock()) return false;
         }
         return true;
-    }
-
-    enum Direction {
-        LEFT,
-        RIGHT,
-        UP,
-        DOWN
     }
 }

@@ -1,18 +1,19 @@
-package com.mike
+package dev.kosmx.bedrockfinder
 
 
-private enum class Direction {
-    LEFT, RIGHT, UP, DOWN
-}
 
-const val checkInvert = true
-
-
-fun snailRanges(aligned: Boolean = false) = sequence {
+const val blockSize = 4096
+fun snailRanges(aligned: Boolean = false, xDefault: Int = 0, zDefault: Int = 0): Sequence<Pair<IntProgression, IntProgression>> = sequence {
     val step = if (aligned) 16 else 1
+    val chunkSize = step * blockSize
+    val max = 30_000_000
     val seq = snail(false).iterator()
-    while (true) {
+    seq.forEach {
+        val x = it.first * chunkSize + xDefault
+        val y = it.second * chunkSize + zDefault
+        if (x > max && y > max) return@sequence
 
+        yield(Pair(x until x + chunkSize step step, y until y + chunkSize step step))
     }
 
 }

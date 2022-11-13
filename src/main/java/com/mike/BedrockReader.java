@@ -29,7 +29,7 @@ public final class BedrockReader {
             if (y > bedrockType.max) return false;
 
             probabilityValue = MathHelper.lerpFromProgress(y, bedrockType.min, bedrockType.max, 1.0, 0.0);
-        } else if (bedrockType == BedrockType.BEDROCK_ROOF) {
+        } else if (bedrockType == BedrockType.NETHER_ROOF) {
             if (y == bedrockType.min) return true;
             if (y < bedrockType.max) return false;
 
@@ -44,7 +44,7 @@ public final class BedrockReader {
         BEDROCK_FLOOR(new Identifier("bedrock_floor"), -64, -64 + 5),
 
         NETHER_FLOOR(new Identifier("bedrock_floor"), 0, 5),
-        BEDROCK_ROOF(new Identifier("bedrock_roof"), 128, 128 - 5);
+        NETHER_ROOF(new Identifier("bedrock_roof"), 128, 128 - 5);
 
         public final Identifier id;
         public final int min;

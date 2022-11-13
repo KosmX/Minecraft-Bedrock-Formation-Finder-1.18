@@ -6,7 +6,7 @@
 
 plugins {
     java
-    kotlin("jvm") version "1.7.20"
+    kotlin("jvm") version "1.7.21"
     `maven-publish`
 }
 
@@ -17,7 +17,13 @@ repositories {
 }
 
 dependencies {
-    implementation("com.google.guava:guava:31.0.1-jre")
+    implementation("com.google.guava:guava:31.1-jre")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.5")
+
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
 }
 
 group = "mike"
@@ -31,10 +37,38 @@ publishing {
     }
 }
 
+tasks {
+
+    val targetJavaVersion = 17
+    withType<JavaCompile> {
+        options.encoding = "UTF-8"
+        options.release.set(targetJavaVersion)
+    }
+
+    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions.jvmTarget = targetJavaVersion.toString()
+    }
+
+    java {
+        toolchain.languageVersion.set(JavaLanguageVersion.of(JavaVersion.toVersion(targetJavaVersion).toString()))
+
+        // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+        // if it is present.
+        // If you remove this line, sources will not be generated.
+        withSourcesJar()
+    }
+
+}
+
 tasks.jar {
     manifest {
-        attributes (
-            "Main-Class" to "com.mike.Main"
-                )
+        attributes(
+            //"Main-Class" to "com.mike.Main"
+            "Main-Class" to "dev.kosmx.bedrockfinder.ModernKt"
+        )
     }
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
