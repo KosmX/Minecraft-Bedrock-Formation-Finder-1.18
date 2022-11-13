@@ -14,7 +14,7 @@ import java.util.Scanner
  *
  * Modernized: parallel computing, Kt arg parser (arg order can vary), input from file and from lines
  */
-fun main(args: Array<String>) {
+fun ktMain(args: Array<String>) {
     val parser = ArgParser("Bedrock formation finder")
 
     val seed: Long by parser.option(LongArg, shortName = "s", fullName = "seed", description = "World seed").required()
@@ -47,7 +47,7 @@ fun main(args: Array<String>) {
     val bedrocksInput: List<BedrockBlock>? by parser.option(
         BedrocksArg,
         fullName = "blocks",
-        "b",
+        "l",
         "Bedrock blocks, if not given, program will read in STDIN until EOF"
     )
     val terminateOnMatch: Boolean by parser.option(
@@ -73,6 +73,7 @@ fun main(args: Array<String>) {
             .toList()
     }
 
+    if (bedrocks.isEmpty()) error("You didn't specify any block")
 
     // Compute
     val bedrockReader = BedrockReader(seed, bedrockType)

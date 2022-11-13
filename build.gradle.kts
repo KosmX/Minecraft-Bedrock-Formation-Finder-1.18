@@ -4,10 +4,19 @@
  * This project uses @Incubating APIs which are subject to change.
  */
 
+buildscript {
+    dependencies {
+        classpath("com.guardsquare:proguard-gradle:7.2.2") {
+            exclude("com.android.tools.build")
+        }
+    }
+}
+
 plugins {
     java
     kotlin("jvm") version "1.7.21"
     `maven-publish`
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 repositories {
@@ -58,16 +67,42 @@ tasks {
         withSourcesJar()
     }
 
+    shadowJar {
+        archiveFileName.set(rootProject.name + ".jar")
+        // your relocations here
+        exclude("ScopeJVMKt.class")
+        exclude("DebugProbesKt.bin")
+        exclude("META-INF/**")
+    }
+
+    register<proguard.gradle.ProGuardTask>("proguard") {
+        // here is where you configure your Proguard stuff, you can include libraries directly
+        // through here, or in the configuration file, I usually just use the configuration file
+        // to do everything (it can be any name and extension you want, just using .pro here cause
+        // that's what Android uses)
+        configuration("proguard-rules.pro")
+        dependsOn(shadowJar)
+        System.setProperty("JAVA_HOME", org.gradle.internal.jvm.Jvm.current().javaHome.absolutePath)
+    }
+
+    jar {
+        manifest {
+            attributes(
+                //"Main-Class" to "com.mike.Main"
+                "Main-Class" to "dev.kosmx.bedrockfinder.Main"
+            )
+        }
+        enabled = false
+    }
+    build.get().finalizedBy(getByName("proguard"))
+
 }
 
-tasks.jar {
-    manifest {
-        attributes(
-            //"Main-Class" to "com.mike.Main"
-            "Main-Class" to "dev.kosmx.bedrockfinder.ModernKt"
-        )
-    }
-}
+
+artifacts.archives(tasks.shadowJar)
+
+
+
 
 tasks.test {
     useJUnitPlatform()

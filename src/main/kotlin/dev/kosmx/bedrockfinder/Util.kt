@@ -23,7 +23,6 @@ fun snail(aligned: Boolean = false, xDefault: Int = 0, zDefault: Int = 0) = sequ
     var stepsToTake = 1
     var stepsTaken = 0
     var sidesUntilIncremental = 0
-    var extraDivision = 0
     var direction = Direction.RIGHT
     while (true) {
         if (x > 30_000_000 || z > 30_000_000) {
@@ -47,10 +46,6 @@ fun snail(aligned: Boolean = false, xDefault: Int = 0, zDefault: Int = 0) = sequ
         if (sidesUntilIncremental > 2) {
             sidesUntilIncremental = 0
             stepsToTake++
-            if (extraDivision++ > 1000) {
-                extraDivision = 0
-                println("$x;$z")
-            }
         }
 
         // Make Step
