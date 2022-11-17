@@ -56,7 +56,7 @@ public class Main {
             if (checkFormation(x, z) || (checkInvert && checkFormationInvert(x, z))) {
                 System.out.println("Found Bedrock Formation at X:" + x + " Z:" + z);
                 System.out.println("/tp " + x + " ~ " + z);
-                break;
+                //break;
             }
         }
     }
