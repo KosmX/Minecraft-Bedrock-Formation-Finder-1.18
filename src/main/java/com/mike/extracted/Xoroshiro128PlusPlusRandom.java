@@ -5,9 +5,10 @@ import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.google.common.primitives.Longs;
 
+@SuppressWarnings("deprecation")
 public class Xoroshiro128PlusPlusRandom implements AbstractRandom {
     private static final float FLOAT_MULTIPLIER = 5.9604645E-8f;
-    private static final double DOUBLE_MULTIPLIER = (double) 1.110223E-16f;
+    private static final double DOUBLE_MULTIPLIER = 1.110223E-16f;
     private Xoroshiro128PlusPlusRandomImpl implementation;
     private final GaussianGenerator gaussianGenerator = new GaussianGenerator(this);
 

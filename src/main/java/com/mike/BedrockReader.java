@@ -44,7 +44,7 @@ public final class BedrockReader {
         BEDROCK_FLOOR(new Identifier("bedrock_floor"), -64, -64 + 5),
 
         NETHER_FLOOR(new Identifier("bedrock_floor"), 0, 5),
-        BEDROCK_ROOF(new Identifier("bedrock_roof"), 128, 128 - 5);
+        NETHER_ROOF(new Identifier("bedrock_roof"), 128, 128 - 5);
 
         public final Identifier id;
         public final int min;

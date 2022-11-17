@@ -4,10 +4,19 @@
  * This project uses @Incubating APIs which are subject to change.
  */
 
+buildscript {
+    dependencies {
+        classpath("com.guardsquare:proguard-gradle:7.2.2") {
+            exclude("com.android.tools.build")
+        }
+    }
+}
+
 plugins {
     java
+    kotlin("jvm") version "1.7.21"
     `maven-publish`
-    kotlin("jvm") version "1.7.20"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 repositories {
@@ -17,7 +26,13 @@ repositories {
 }
 
 dependencies {
-    implementation("com.google.guava:guava:31.0.1-jre")
+    implementation("com.google.guava:guava:31.1-jre")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.5")
+
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
 }
 
 group = "mike"
@@ -31,10 +46,64 @@ publishing {
     }
 }
 
-tasks.jar {
-    manifest {
-        attributes (
-            "Main-Class" to "com.mike.Main"
-                )
+tasks {
+
+    val targetJavaVersion = 17
+    withType<JavaCompile> {
+        options.encoding = "UTF-8"
+        options.release.set(targetJavaVersion)
     }
+
+    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions.jvmTarget = targetJavaVersion.toString()
+    }
+
+    java {
+        toolchain.languageVersion.set(JavaLanguageVersion.of(JavaVersion.toVersion(targetJavaVersion).toString()))
+
+        // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+        // if it is present.
+        // If you remove this line, sources will not be generated.
+        withSourcesJar()
+    }
+
+    shadowJar {
+        archiveFileName.set(rootProject.name + ".jar")
+        // your relocations here
+        exclude("ScopeJVMKt.class")
+        exclude("DebugProbesKt.bin")
+        exclude("META-INF/**")
+    }
+
+    register<proguard.gradle.ProGuardTask>("proguard") {
+        // here is where you configure your Proguard stuff, you can include libraries directly
+        // through here, or in the configuration file, I usually just use the configuration file
+        // to do everything (it can be any name and extension you want, just using .pro here cause
+        // that's what Android uses)
+        configuration("proguard-rules.pro")
+        dependsOn(shadowJar)
+        System.setProperty("JAVA_HOME", org.gradle.internal.jvm.Jvm.current().javaHome.absolutePath)
+    }
+
+    jar {
+        manifest {
+            attributes(
+                //"Main-Class" to "com.mike.Main"
+                "Main-Class" to "dev.kosmx.bedrockfinder.Main"
+            )
+        }
+        enabled = false
+    }
+    build.get().finalizedBy(getByName("proguard"))
+
+}
+
+
+artifacts.archives(tasks.shadowJar)
+
+
+
+
+tasks.test {
+    useJUnitPlatform()
 }
