@@ -43,7 +43,7 @@ fun snail(aligned: Boolean = false, xDefault: Int = 0, zDefault: Int = 0) = sequ
         }
 
         // Increase steps to take
-        if (sidesUntilIncremental > 2) {
+        if (sidesUntilIncremental >= 2) {
             sidesUntilIncremental = 0
             stepsToTake++
         }

@@ -29,7 +29,7 @@ public final class BedrockReader {
             if (y > bedrockType.max) return false;
 
             probabilityValue = bedrockType.probabilityValue[y - bedrockType.min]; //Skip a lot of hard math
-        } else if (bedrockType == BedrockType.BEDROCK_ROOF) {
+        } else if (bedrockType == BedrockType.NETHER_ROOF) {
             if (y == bedrockType.min) return true;
             if (y < bedrockType.max) return false;
 
